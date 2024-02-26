@@ -1,9 +1,10 @@
 "use client"
 import { Button, ButtonGroup, Flex, FormLabel, Heading, Input, Radio, RadioGroup, Select, Textarea } from "@chakra-ui/react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { encAffine, decAffine } from "../utils/affine";
 import { encPlayfair, decPlayfair } from "@/utils/playfair";
 import { encVigenere, decVigenere } from "@/utils/vigenere";
+import { encProduct, decProduct } from "@/utils/product";
 
 const DEFAULT_BG_COLOR = '#ffffff';
 const ALGO_LIST = ['Vigenere Cipher', 'Extended Vigenere Cipher', 'Autokey Vigenere Cipher', 'Playfair Cipher', 'Product Cipher', 'Affine Cipher']
@@ -17,6 +18,8 @@ export default function Home() {
   const [mKey, setMKey] = useState<number>(0);
   const [bKey, setBKey] = useState<number>(0);
   const [resultText, setResultText] = useState<String>('');
+  const [file, setFile] = useState<File | null>();
+  const [fileName, setFileName] = useState('');
 
   const handleAlgoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setAlgo(e.target.value);
@@ -30,6 +33,47 @@ export default function Home() {
     setInputText(e.target.value);
   }
 
+  useEffect(() => {
+    if (file) {
+      setFileName(file.name)
+      const reader = new FileReader()
+
+      if (file.name.includes('.txt')) {
+        reader.readAsText(file)
+      } else {
+        reader.readAsBinaryString(file)
+      }
+
+      reader.onload = function(e) {
+        const text = reader.result as string
+        setInputText(text)
+      }
+    }
+  }, [file])
+
+  const saveToBinaryFile = (): void => {
+    downloadFile(resultText, fileName);
+  };
+
+  const downloadFile = (resultText: String, fileName: string) => {
+    const link = document.createElement("a");
+    const output = [];
+    for (let i = 0; i < resultText.length; i++) {
+      output.push(resultText.charCodeAt(i));
+    }
+
+    const blob = new Blob([new Uint8Array(output)]);
+    link.href = URL.createObjectURL(blob);
+
+    if (fileName === "") {
+      link.download = "result.txt";
+    } else {
+      link.download = "result_" + fileName;
+    }
+    
+    link.click();
+  };
+
   const handleEncrypt = () => {
     console.log(algo)
     if (algo == "Vigenere Cipher"){
@@ -41,7 +85,7 @@ export default function Home() {
     } else if (algo == "Playfair Cipher"){
       setResultText(encPlayfair(inputText, key))
     } else if (algo == "Product Cipher"){
-      setResultText("Product Cipher")
+      setResultText(encProduct(inputText, key))
     } else if (algo == "Affine Cipher"){
       setResultText(encAffine(mKey, inputText, bKey))
     } else {
@@ -60,7 +104,7 @@ export default function Home() {
     } else if (algo == "Playfair Cipher"){
       setResultText(decPlayfair(inputText, key))
     } else if (algo == "Product Cipher"){
-      setResultText("Product Cipher")
+      setResultText(decProduct(inputText, key))
     } else if (algo == "Affine Cipher"){
       setResultText(decAffine(mKey, inputText, bKey))
     } else {
@@ -94,7 +138,11 @@ export default function Home() {
         :
         <Flex flexDir={'column'}>
           <FormLabel>Upload File</FormLabel>
-          <Input type="file" bgColor={DEFAULT_BG_COLOR}/>
+          <Input type="file" bgColor={DEFAULT_BG_COLOR} onChange={(e) => {
+            if (e.target.files != null && e.target.files.length > 0) {
+              setFile(e.target.files[0])
+            }
+          }}/>
         </Flex>
         }
 
@@ -134,13 +182,19 @@ export default function Home() {
       </Flex>
       <ButtonGroup spacing={4}>
           {value === 'encrypt' ? <Button onClick={(e) => handleEncrypt()}>Encrypt</Button> : <Button onClick={(e) => handleDecrypt()}>Decrypt</Button>}
-            <Button>Download File</Button>
+            <Button onClick={saveToBinaryFile}>Download File</Button>
       </ButtonGroup>
 
       {resultText !== '' ?
-        <Flex flexDir={'column'} width={{base:'80%', md:'70%'}} paddingBottom={8}>
-          <FormLabel>Result</FormLabel>
-          <Flex bgColor={DEFAULT_BG_COLOR} height={'100px'} borderRadius={'6px'} border={'1px solid #e2e8f0'} paddingX={4} paddingY={2}>{resultText}</Flex>
+        <Flex flexDir={'column'} width={{base:'80%', md:'70%'}} paddingBottom={8} gap={4}>
+          <Flex flexDir={'column'}>
+            <FormLabel>Result</FormLabel>
+            <Flex bgColor={DEFAULT_BG_COLOR} minHeight={'100px'} maxHeight={'500px'} borderRadius={'6px'} border={'1px solid #e2e8f0'} paddingX={4} paddingY={2} maxWidth={'100%'} overflowY={'auto'}>{resultText}</Flex>
+          </Flex>
+          {/* <Flex flexDir={'column'}>
+            <FormLabel>Result Base-64</FormLabel>
+            <Flex bgColor={DEFAULT_BG_COLOR} height={'100px'} borderRadius={'6px'} border={'1px solid #e2e8f0'} paddingX={4} paddingY={2}>{btoa(resultText)}</Flex>
+          </Flex> */}
         </Flex>
         : null
       }
