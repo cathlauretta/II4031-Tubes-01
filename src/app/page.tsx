@@ -1,95 +1,90 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client"
+import { Button, ButtonGroup, Flex, FormLabel, Heading, Input, Radio, RadioGroup, Select, Textarea } from "@chakra-ui/react";
+import { useState } from "react";
+
+const DEFAULT_BG_COLOR = '#ffffff';
+const ALGO_LIST = ['Vigenere Cipher', 'Extended Vigenere Cipher', 'Autokey Vigenere Cipher', 'Playfair Cipher', 'Product Cipher', 'Affine Cipher']
 
 export default function Home() {
+  const [value, setValue] = useState('encrypt');
+  const [algo, setAlgo] = useState<string>('');
+  const [inputType, setInputType] = useState<string>('text');
+
+  const handleAlgoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setAlgo(e.target.value);
+  }
+
+  const handleInputTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setInputType(e.target.value);
+  }
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+    <Flex bgColor={'#f2f4f6'} minHeight={'100vh'} gap={12} flexDir={'column'} paddingTop={8} alignItems={'center'}>
+      {value === 'encrypt' ? <Heading>En-Crypto</Heading> : <Heading>De-Crypto</Heading>}
+      <Flex flexDir={'column'} width={{base:'80%', md:'70%'}} gap={4}>
+        <Flex flexDir={'column'}>
+          <FormLabel>Input Type</FormLabel>
+          <Select bgColor={DEFAULT_BG_COLOR} onChange={(e) => handleInputTypeChange(e)}>
+            <option value='text'>Text</option>
+            <option value='file'>File</option>
+          </Select>
+        </Flex>
+        
+        {inputType === 'text' ?
+        <Flex flexDir={'column'}>
+          <FormLabel>Input Text</FormLabel>
+          <Textarea
+            placeholder="Enter text to encrypt or decrypt"
+            bgColor={DEFAULT_BG_COLOR}
+            height={'100px'}
+            resize={'none'}
+          />
+        </Flex>
+        :
+        <Flex flexDir={'column'}>
+          <FormLabel>Upload File</FormLabel>
+          <Input type="file" bgColor={DEFAULT_BG_COLOR}/>
+        </Flex>
+        }
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+        <Flex flexDir={'column'}>
+          <FormLabel>Cipher Algorithm</FormLabel>
+          <Select placeholder="Select a cipher algorithm" bgColor={DEFAULT_BG_COLOR} onChange={(e) => handleAlgoChange(e)}>
+            {ALGO_LIST.map((type) => (
+              <option value={type}>{type}</option>
+            ))}
+          </Select>
+        </Flex>
 
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
+        {algo === 'Affine Cipher' ?
+          <Flex flexDir={'row'} gap={4} justifyContent={'space-between'}>
+            <Flex flexDir={'column'} width={'100%'}>
+              <FormLabel>M-Key</FormLabel>
+              <Input placeholder="Enter a number that is relative prime to 26" bgColor={DEFAULT_BG_COLOR}/>
+            </Flex>
+            <Flex flexDir={'column'} width={'100%'}>
+              <FormLabel>B-Key</FormLabel>
+              <Input placeholder="Enter a number" bgColor={DEFAULT_BG_COLOR}/>
+            </Flex>
+          </Flex>
+          : 
+          <Flex flexDir={'column'}>
+            <FormLabel>Key</FormLabel>
+            <Input placeholder="Enter a key" bgColor={DEFAULT_BG_COLOR}/>
+          </Flex>
+        }
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+        <RadioGroup onChange={setValue} value={value}>
+          <Flex gap={4}>
+            <Radio value="encrypt">Encrypt</Radio>
+            <Radio value="decrypt">Decrypt</Radio>
+          </Flex>
+        </RadioGroup>
+      </Flex>
+      <ButtonGroup spacing={4}>
+          {value === 'encrypt' ? <Button>Encrypt</Button> : <Button>Decrypt</Button>}
+            <Button>Download File</Button>
+      </ButtonGroup>
+    </Flex>
   );
 }
