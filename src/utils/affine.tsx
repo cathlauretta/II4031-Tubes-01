@@ -7,7 +7,7 @@ const inverseMod = (a: number, mod: number): number => {
   throw new Error("Can Not Find Mod Inverse!");
 };
 
-function encAffine(m: number, plaintext: String, b: number): String {
+export function encAffine(m: number, plaintext: String, b: number): String {
   var ciphertext = new String("");
   for (let x = 0; x < plaintext.length; x++) {
     const cipherNum = ((m * (plaintext.charCodeAt(x) - 97) + b) % 26) + 97;
@@ -16,7 +16,7 @@ function encAffine(m: number, plaintext: String, b: number): String {
   return ciphertext;
 }
 
-function decAffine(m: number, ciphertext: String, b: number): String {
+export function decAffine(m: number, ciphertext: String, b: number): String {
   var decryptedtext = new String("");
   for (let x = 0; x < ciphertext.length; x++) {
     const decryptedNum = ((inverseMod(m, 26) * (ciphertext.charCodeAt(x) - b)) % 26) + 97;
