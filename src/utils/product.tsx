@@ -1,4 +1,3 @@
-import React from 'react'
 import { loopKey, sanitizeKey } from './vigenere'
 
 const BASE_ORD = 65;

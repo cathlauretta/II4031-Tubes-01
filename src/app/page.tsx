@@ -34,7 +34,7 @@ export default function Home() {
   const [algo, setAlgo] = useState<string>("");
   const [inputType, setInputType] = useState<string>("text");
   const [inputText, setInputText] = useState<string>("");
-  const [key, setKey] = useState("");
+  const [key, setKey] = useState<string>("");
   const [mKey, setMKey] = useState<number>(0);
   const [bKey, setBKey] = useState<number>(0);
   const [resultText, setResultText] = useState<String>("");
@@ -51,6 +51,8 @@ export default function Home() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputText(e.target.value);
+    if (inputText == "") {
+    }
   };
 
   useEffect(() => {
@@ -109,7 +111,7 @@ export default function Home() {
     } else if (algo == "Affine Cipher") {
       setResultText(encAffine(mKey, inputText, bKey));
     } else {
-      setResultText("ERROR INPUT");
+      setResultText("ERROR: Choose A Cipher Algorithm");
     }
   };
 
@@ -164,13 +166,17 @@ export default function Home() {
               bgColor={DEFAULT_BG_COLOR}
               height={"100px"}
               resize={"none"}
-              onChange={(e) => handleInputChange(e)}
+              onChange={(e) => {
+                handleInputChange(e);
+              }}
             />
           </Flex>
         ) : (
           <Flex flexDir={"column"}>
             <FormLabel>Upload File</FormLabel>
             <Input
+              h="12"
+              pt="2"
               type="file"
               bgColor={DEFAULT_BG_COLOR}
               onChange={(e) => {
@@ -243,9 +249,19 @@ export default function Home() {
       </Flex>
       <ButtonGroup spacing={4}>
           {value === 'encrypt' ?
-          <Button onClick={(e) => handleEncrypt()} colorScheme="green">Encrypt</Button>
-          : <Button onClick={(e) => handleDecrypt()} colorScheme="yellow">Decrypt</Button>}
-            <Button onClick={saveToBinaryFile} colorScheme="blue">Download File</Button>
+          <Button
+            isDisabled={!key || !algo || !inputText}
+            onClick={(e) => handleEncrypt()} colorScheme="green">
+            Encrypt
+          </Button>
+          : <Button
+            isDisabled={!key || !algo || !inputText}
+            onClick={(e) => handleDecrypt()} colorScheme="yellow">
+            Decrypt
+          </Button>}
+            <Button isDisabled={!resultText} onClick={saveToBinaryFile} colorScheme="blue">
+          Download File
+        </Button>
       </ButtonGroup>
 
       {resultText !== "" ? (
