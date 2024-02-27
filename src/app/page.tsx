@@ -248,20 +248,18 @@ export default function Home() {
         </RadioGroup>
       </Flex>
       <ButtonGroup spacing={4}>
-        {value === "encrypt" ? (
+          {value === 'encrypt' ?
           <Button
             isDisabled={!key || !algo || !inputText}
-            onClick={(e) => handleEncrypt()}>
+            onClick={(e) => handleEncrypt()} colorScheme="green">
             Encrypt
           </Button>
-        ) : (
-          <Button
+          : <Button
             isDisabled={!key || !algo || !inputText}
-            onClick={(e) => handleDecrypt()}>
+            onClick={(e) => handleDecrypt()} colorScheme="yellow">
             Decrypt
-          </Button>
-        )}
-        <Button isDisabled={!resultText} onClick={saveToBinaryFile}>
+          </Button>}
+            <Button isDisabled={!resultText} onClick={saveToBinaryFile} colorScheme="blue">
           Download File
         </Button>
       </ButtonGroup>
@@ -287,10 +285,6 @@ export default function Home() {
               {resultText}
             </Flex>
           </Flex>
-          {/* <Flex flexDir={'column'}>
-            <FormLabel>Result Base-64</FormLabel>
-            <Flex bgColor={DEFAULT_BG_COLOR} height={'100px'} borderRadius={'6px'} border={'1px solid #e2e8f0'} paddingX={4} paddingY={2}>{btoa(resultText)}</Flex>
-          </Flex> */}
         </Flex>
       ) : null}
     </Flex>
