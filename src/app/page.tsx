@@ -181,8 +181,10 @@ export default function Home() {
         </RadioGroup>
       </Flex>
       <ButtonGroup spacing={4}>
-          {value === 'encrypt' ? <Button onClick={(e) => handleEncrypt()}>Encrypt</Button> : <Button onClick={(e) => handleDecrypt()}>Decrypt</Button>}
-            <Button onClick={saveToBinaryFile}>Download File</Button>
+          {value === 'encrypt' ?
+          <Button onClick={(e) => handleEncrypt()} colorScheme="green">Encrypt</Button>
+          : <Button onClick={(e) => handleDecrypt()} colorScheme="yellow">Decrypt</Button>}
+            <Button onClick={saveToBinaryFile} colorScheme="blue">Download File</Button>
       </ButtonGroup>
 
       {resultText !== '' ?
@@ -191,10 +193,6 @@ export default function Home() {
             <FormLabel>Result</FormLabel>
             <Flex bgColor={DEFAULT_BG_COLOR} minHeight={'100px'} maxHeight={'500px'} borderRadius={'6px'} border={'1px solid #e2e8f0'} paddingX={4} paddingY={2} maxWidth={'100%'} overflowY={'auto'}>{resultText}</Flex>
           </Flex>
-          {/* <Flex flexDir={'column'}>
-            <FormLabel>Result Base-64</FormLabel>
-            <Flex bgColor={DEFAULT_BG_COLOR} height={'100px'} borderRadius={'6px'} border={'1px solid #e2e8f0'} paddingX={4} paddingY={2}>{btoa(resultText)}</Flex>
-          </Flex> */}
         </Flex>
         : null
       }
