@@ -12,6 +12,7 @@ import {
   Select,
   Textarea,
   NumberInputField,
+  ChakraProvider,
 } from "@chakra-ui/react";
 import React, { ReactHTMLElement, useEffect, useState } from "react";
 import { encAffine, decAffine } from "../utils/affine";
@@ -73,6 +74,10 @@ export default function Home() {
     }
   }, [file]);
 
+  const encodeBase64 = (data: any) => {
+    return Buffer.from(data).toString("base64");
+  }
+
   const saveToBinaryFile = (): void => {
     downloadFile(resultText, fileName);
   };
@@ -97,7 +102,6 @@ export default function Home() {
   };
 
   const handleEncrypt = () => {
-    console.log(algo);
     if (algo == "Vigenere Cipher") {
       setResultText(encVigenere(inputText, key, 0));
     } else if (algo == "Autokey Vigenere Cipher") {
@@ -116,7 +120,6 @@ export default function Home() {
   };
 
   const handleDecrypt = () => {
-    console.log(algo);
     if (algo == "Vigenere Cipher") {
       setResultText(decVigenere(inputText, key, 0));
     } else if (algo == "Autokey Vigenere Cipher") {
@@ -135,158 +138,175 @@ export default function Home() {
   };
 
   return (
-    <Flex
-      bgColor={"#f2f4f6"}
-      minHeight={"100vh"}
-      gap={8}
-      flexDir={"column"}
-      paddingTop={8}
-      alignItems={"center"}>
-      {value === "encrypt" ? (
-        <Heading>En-Crypto</Heading>
-      ) : (
-        <Heading>De-Crypto</Heading>
-      )}
-      <Flex flexDir={"column"} width={{ base: "80%", md: "70%" }} gap={4}>
-        <Flex flexDir={"column"}>
-          <FormLabel>Input Type</FormLabel>
-          <Select
-            bgColor={DEFAULT_BG_COLOR}
-            onChange={(e) => handleInputTypeChange(e)}>
-            <option value="text">Text</option>
-            <option value="file">File</option>
-          </Select>
-        </Flex>
-
-        {inputType === "text" ? (
-          <Flex flexDir={"column"}>
-            <FormLabel>Input Text</FormLabel>
-            <Textarea
-              placeholder="Enter text to encrypt or decrypt"
-              bgColor={DEFAULT_BG_COLOR}
-              height={"100px"}
-              resize={"none"}
-              onChange={(e) => {
-                handleInputChange(e);
-              }}
-            />
-          </Flex>
+    <ChakraProvider>
+      <Flex
+        bgColor={"#f2f4f6"}
+        minHeight={"100vh"}
+        gap={8}
+        flexDir={"column"}
+        paddingTop={8}
+        alignItems={"center"}>
+        {value === "encrypt" ? (
+          <Heading>En-Crypto</Heading>
         ) : (
-          <Flex flexDir={"column"}>
-            <FormLabel>Upload File</FormLabel>
-            <Input
-              h="12"
-              pt="2"
-              type="file"
-              bgColor={DEFAULT_BG_COLOR}
-              onChange={(e) => {
-                if (e.target.files != null && e.target.files.length > 0) {
-                  setFile(e.target.files[0]);
-                }
-              }}
-            />
-          </Flex>
+          <Heading>De-Crypto</Heading>
         )}
+        <Flex flexDir={"column"} width={{ base: "80%", md: "70%" }} gap={4}>
+          <Flex flexDir={"column"}>
+            <FormLabel>Input Type</FormLabel>
+            <Select
+              bgColor={DEFAULT_BG_COLOR}
+              onChange={(e) => handleInputTypeChange(e)}>
+              <option value="text">Text</option>
+              <option value="file">File</option>
+            </Select>
+          </Flex>
 
-        <Flex flexDir={"column"}>
-          <FormLabel>Cipher Algorithm</FormLabel>
-          <Select
-            placeholder="Select a cipher algorithm"
-            bgColor={DEFAULT_BG_COLOR}
-            onChange={(e) => handleAlgoChange(e)}>
-            {ALGO_LIST.map((type) => (
-              <option value={type}>{type}</option>
-            ))}
-          </Select>
+          {inputType === "text" ? (
+            <Flex flexDir={"column"}>
+              <FormLabel>Input Text</FormLabel>
+              <Textarea
+                placeholder="Enter text to encrypt or decrypt"
+                bgColor={DEFAULT_BG_COLOR}
+                height={"100px"}
+                resize={"none"}
+                onChange={(e) => {
+                  handleInputChange(e);
+                }}
+              />
+            </Flex>
+          ) : (
+            <Flex flexDir={"column"}>
+              <FormLabel>Upload File</FormLabel>
+              <Input
+                h="12"
+                pt="2"
+                type="file"
+                bgColor={DEFAULT_BG_COLOR}
+                onChange={(e) => {
+                  if (e.target.files != null && e.target.files.length > 0) {
+                    setFile(e.target.files[0]);
+                  }
+                }}
+              />
+            </Flex>
+          )}
+
+          <Flex flexDir={"column"}>
+            <FormLabel>Cipher Algorithm</FormLabel>
+            <Select
+              placeholder="Select a cipher algorithm"
+              bgColor={DEFAULT_BG_COLOR}
+              onChange={(e) => handleAlgoChange(e)}>
+              {ALGO_LIST.map((type) => (
+                <option value={type}>{type}</option>
+              ))}
+            </Select>
+          </Flex>
+
+          {algo === "Affine Cipher" ? (
+            <Flex flexDir={"row"} gap={4} justifyContent={"space-between"}>
+              <Flex flexDir={"column"} width={"100%"}>
+                <FormLabel>M-Key</FormLabel>
+                <NumberInput>
+                  <NumberInputField
+                    placeholder="Enter a number that is relative prime to 26"
+                    bgColor={DEFAULT_BG_COLOR}
+                    onChange={(e) => {
+                      setMKey(parseInt(e.target.value));
+                      // console.log("M-Key =", mKey);
+                    }}
+                  />
+                </NumberInput>
+              </Flex>
+              <Flex flexDir={"column"} width={"100%"}>
+                <FormLabel>B-Key</FormLabel>
+                <NumberInput>
+                  <NumberInputField
+                    placeholder="Enter a number"
+                    bgColor={DEFAULT_BG_COLOR}
+                    onChange={(e) => {
+                      setBKey(parseInt(e.target.value));
+                      // console.log("B-Key =", bKey);
+                    }}
+                  />
+                </NumberInput>
+              </Flex>
+            </Flex>
+          ) : (
+            <Flex flexDir={"column"}>
+              <FormLabel>Key</FormLabel>
+              <Input
+                placeholder="Enter a key"
+                bgColor={DEFAULT_BG_COLOR}
+                onChange={(e) => setKey(e.target.value)}
+              />
+            </Flex>
+          )}
+
+          <RadioGroup onChange={setValue} value={value}>
+            <Flex gap={4}>
+              <Radio value="encrypt">Encrypt</Radio>
+              <Radio value="decrypt">Decrypt</Radio>
+            </Flex>
+          </RadioGroup>
         </Flex>
-
-        {algo === "Affine Cipher" ? (
-          <Flex flexDir={"row"} gap={4} justifyContent={"space-between"}>
-            <Flex flexDir={"column"} width={"100%"}>
-              <FormLabel>M-Key</FormLabel>
-              <NumberInput>
-                <NumberInputField
-                  placeholder="Enter a number that is relative prime to 26"
-                  bgColor={DEFAULT_BG_COLOR}
-                  onChange={(e) => {
-                    setMKey(parseInt(e.target.value));
-                    // console.log("M-Key =", mKey);
-                  }}
-                />
-              </NumberInput>
-            </Flex>
-            <Flex flexDir={"column"} width={"100%"}>
-              <FormLabel>B-Key</FormLabel>
-              <NumberInput>
-                <NumberInputField
-                  placeholder="Enter a number"
-                  bgColor={DEFAULT_BG_COLOR}
-                  onChange={(e) => {
-                    setBKey(parseInt(e.target.value));
-                    // console.log("B-Key =", bKey);
-                  }}
-                />
-              </NumberInput>
-            </Flex>
-          </Flex>
-        ) : (
-          <Flex flexDir={"column"}>
-            <FormLabel>Key</FormLabel>
-            <Input
-              placeholder="Enter a key"
-              bgColor={DEFAULT_BG_COLOR}
-              onChange={(e) => setKey(e.target.value)}
-            />
-          </Flex>
-        )}
-
-        <RadioGroup onChange={setValue} value={value}>
-          <Flex gap={4}>
-            <Radio value="encrypt">Encrypt</Radio>
-            <Radio value="decrypt">Decrypt</Radio>
-          </Flex>
-        </RadioGroup>
-      </Flex>
-      <ButtonGroup spacing={4}>
-          {value === 'encrypt' ?
-          <Button
-            isDisabled={!key || !algo || !inputText}
-            onClick={(e) => handleEncrypt()} colorScheme="green">
-            Encrypt
+        <ButtonGroup spacing={4}>
+            {value === 'encrypt' ?
+            <Button
+              isDisabled={!key || !algo || !inputText}
+              onClick={(e) => handleEncrypt()} colorScheme="green">
+              Encrypt
+            </Button>
+            : <Button
+              isDisabled={!key || !algo || !inputText}
+              onClick={(e) => handleDecrypt()} colorScheme="orange">
+              Decrypt
+            </Button>}
+              <Button isDisabled={!resultText} onClick={saveToBinaryFile} colorScheme="blue">
+            Download File
           </Button>
-          : <Button
-            isDisabled={!key || !algo || !inputText}
-            onClick={(e) => handleDecrypt()} colorScheme="yellow">
-            Decrypt
-          </Button>}
-            <Button isDisabled={!resultText} onClick={saveToBinaryFile} colorScheme="blue">
-          Download File
-        </Button>
-      </ButtonGroup>
+        </ButtonGroup>
 
-      {resultText !== "" ? (
-        <Flex
-          flexDir={"column"}
-          width={{ base: "80%", md: "70%" }}
-          paddingBottom={8}
-          gap={4}>
-          <Flex flexDir={"column"}>
-            <FormLabel>Result</FormLabel>
-            <Flex
-              bgColor={DEFAULT_BG_COLOR}
-              minHeight={"100px"}
-              maxHeight={"500px"}
-              borderRadius={"6px"}
-              border={"1px solid #e2e8f0"}
-              paddingX={4}
-              paddingY={2}
-              maxWidth={"100%"}
-              overflowY={"auto"}>
-              {resultText}
+        {resultText !== "" ? (
+          <Flex
+            flexDir={"column"}
+            width={{ base: "80%", md: "70%" }}
+            paddingBottom={8}
+            gap={4}>
+            <Flex flexDir={"column"}>
+              <FormLabel>Result</FormLabel>
+              <Flex
+                bgColor={DEFAULT_BG_COLOR}
+                minHeight={"100px"}
+                maxHeight={"500px"}
+                borderRadius={"6px"}
+                border={"1px solid #e2e8f0"}
+                paddingX={4}
+                paddingY={2}
+                maxWidth={"100%"}
+                overflowY={"auto"}>
+                {resultText}
+              </Flex>
+            </Flex>
+            <Flex flexDir={"column"}>
+              <FormLabel>Result</FormLabel>
+              <Flex
+                bgColor={DEFAULT_BG_COLOR}
+                minHeight={"100px"}
+                maxHeight={"500px"}
+                borderRadius={"6px"}
+                border={"1px solid #e2e8f0"}
+                paddingX={4}
+                paddingY={2}
+                maxWidth={"100%"}
+                overflowY={"auto"}>
+                {encodeBase64(resultText)}
+              </Flex>
             </Flex>
           </Flex>
-        </Flex>
-      ) : null}
-    </Flex>
+        ) : null}
+      </Flex>
+    </ChakraProvider>
   );
 }

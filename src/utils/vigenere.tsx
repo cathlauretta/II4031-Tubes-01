@@ -6,21 +6,29 @@ export function sanitizeKey(key: String): string {
 
 export function autoKey(key: String, plaintext: String): String {
   /* Nyambungin key dengan potongan plaintext hingga sepanjang plaintext */
-  return key += (plaintext.slice(0, plaintext.length - key.length));
+  if (key.length >= plaintext.length) {
+    return key;
+  } else {
+    return key += (plaintext.slice(0, plaintext.length - key.length));
+  }
 };
 
 export function loopKey(key: String, n: number): String {
   /* Ngulangin key ampe panjangnya sama kayak plaintext */
-  var x = 0;
-  var fk = new String(key)
-  while (fk.length != n) {
-    fk += key.charAt(x);
-    x++;
-    if (x == key.length) {
-      x = 0;
+  if (key.length >= n) {
+    return key;
+  } else {
+    var x = 0;
+    var fk = new String(key)
+    while (fk.length != n) {
+      fk += key.charAt(x);
+      x++;
+      if (x == key.length) {
+        x = 0;
+      }
     }
+    return fk;
   }
-  return fk;
 };
 
 export function encVigenere(plaintext: String, key: String, type: number): String {
@@ -28,6 +36,7 @@ export function encVigenere(plaintext: String, key: String, type: number): Strin
   var ciphertext = new String("");
 
   if (type == 2) {
+    key = sanitizeKey(key)
     fullkey = loopKey(key, plaintext.length);
     for (let x = 0; x < plaintext.length; x++) {
       var cipherNum = ((plaintext.charCodeAt(x) - BASE_ORD + (fullkey.charCodeAt(x) - BASE_ORD)) % 256) + BASE_ORD;
@@ -57,9 +66,15 @@ export function decVigenere(ciphertext: String, key: String, type: number): Stri
   var decryptedtext = new String("");
 
   if (type == 2) {
+    key = sanitizeKey(key)
     fullkey = loopKey(key, ciphertext.length);
+    console.log(fullkey)
     for (let x = 0; x < ciphertext.length; x++) {
       var cipherNum = ((ciphertext.charCodeAt(x) - BASE_ORD - (fullkey.charCodeAt(x) - BASE_ORD)) % 256) + BASE_ORD;
+      if (cipherNum < 0) {
+        cipherNum += 256;
+      }
+      console.log(cipherNum);
       decryptedtext += (String.fromCharCode(cipherNum));
     }
   } else {
