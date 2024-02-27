@@ -3,6 +3,7 @@ import {
   Button,
   ButtonGroup,
   Flex,
+  FormControl,
   FormLabel,
   Heading,
   NumberInput,
@@ -13,6 +14,7 @@ import {
   Textarea,
   NumberInputField,
   ChakraProvider,
+  FormHelperText,
 } from "@chakra-ui/react";
 import React, { ReactHTMLElement, useEffect, useState } from "react";
 import { encAffine, decAffine } from "../utils/affine";
@@ -42,6 +44,10 @@ export default function Home() {
   const [file, setFile] = useState<File | null>();
   const [fileName, setFileName] = useState("");
 
+  const hasAlphabet = (input: string) => {
+    return /[a-zA-Z]/.test(input.replace(/[^A-Za-z]/g, ""));
+  };
+
   const handleAlgoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setAlgo(e.target.value);
   };
@@ -52,8 +58,6 @@ export default function Home() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputText(e.target.value);
-    if (inputText == "") {
-    }
   };
 
   useEffect(() => {
@@ -76,7 +80,7 @@ export default function Home() {
 
   const encodeBase64 = (data: any) => {
     return Buffer.from(data).toString("base64");
-  }
+  };
 
   const saveToBinaryFile = (): void => {
     downloadFile(resultText, fileName);
@@ -139,6 +143,7 @@ export default function Home() {
 
   return (
     <ChakraProvider>
+      <title>NDCrypto - Cipher Tool</title>
       <Flex
         bgColor={"#f2f4f6"}
         minHeight={"100vh"}
@@ -235,12 +240,15 @@ export default function Home() {
             </Flex>
           ) : (
             <Flex flexDir={"column"}>
-              <FormLabel>Key</FormLabel>
-              <Input
-                placeholder="Enter a key"
-                bgColor={DEFAULT_BG_COLOR}
-                onChange={(e) => setKey(e.target.value)}
-              />
+              <FormControl>
+                <FormLabel>Key</FormLabel>
+                <Input
+                  placeholder="Enter a key"
+                  bgColor={DEFAULT_BG_COLOR}
+                  onChange={(e) => setKey(e.target.value)}
+                />
+                <FormHelperText>Please Only Use Alphabet</FormHelperText>
+              </FormControl>
             </Flex>
           )}
 
@@ -252,18 +260,25 @@ export default function Home() {
           </RadioGroup>
         </Flex>
         <ButtonGroup spacing={4}>
-            {value === 'encrypt' ?
+          {value === "encrypt" ? (
             <Button
-              isDisabled={!key || !algo || !inputText}
-              onClick={(e) => handleEncrypt()} colorScheme="green">
+              isDisabled={!key || !algo || !inputText || !hasAlphabet(key)}
+              onClick={(e) => handleEncrypt()}
+              colorScheme="green">
               Encrypt
             </Button>
-            : <Button
-              isDisabled={!key || !algo || !inputText}
-              onClick={(e) => handleDecrypt()} colorScheme="orange">
+          ) : (
+            <Button
+              isDisabled={!key || !algo || !inputText || !hasAlphabet(key)}
+              onClick={(e) => handleDecrypt()}
+              colorScheme="orange">
               Decrypt
-            </Button>}
-              <Button isDisabled={!resultText} onClick={saveToBinaryFile} colorScheme="blue">
+            </Button>
+          )}
+          <Button
+            isDisabled={!resultText}
+            onClick={saveToBinaryFile}
+            colorScheme="blue">
             Download File
           </Button>
         </ButtonGroup>
@@ -290,7 +305,7 @@ export default function Home() {
               </Flex>
             </Flex>
             <Flex flexDir={"column"}>
-              <FormLabel>Result</FormLabel>
+              <FormLabel>Result in Base64 Format</FormLabel>
               <Flex
                 bgColor={DEFAULT_BG_COLOR}
                 minHeight={"100px"}
