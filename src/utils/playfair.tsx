@@ -38,7 +38,6 @@ const plainMatrix = (plaintext: String): Array<String> => {
     .toUpperCase()
     .replace(/[^A-Z]/g, "")
     .replace("J", "I");
-  console.log(plaintext);
 
   var loop = true;
   var x = 1;
@@ -81,8 +80,6 @@ export function encPlayfair(plaintext: String, key: String): String {
   const km = keyMatrix(key);
   const encBigrams = new Array<String>();
 
-  console.log(bigrams);
-  console.log(km);
   // Untuk setiap bigram
   for (var bigram of bigrams) {
     // Cari posisi dari setiap karakter
@@ -125,7 +122,7 @@ export function encPlayfair(plaintext: String, key: String): String {
 
 // Menghilangkan x yang pernah disisipkan,
 // kecuali yang di akhir yang menggenapkan jumlah karakter
-const postprocess = (text: String): String => {
+const postProcess = (text: String): String => {
   var x = 0;
   var loop = true;
   while (loop) {
@@ -187,5 +184,5 @@ export function decPlayfair(ciphertext: String, key: String): String {
     }
   }
 
-  return postprocess(decBigrams.join(""));
+  return postProcess(decBigrams.join(""));
 }

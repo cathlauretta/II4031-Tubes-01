@@ -21,8 +21,6 @@ export function encAffine(m: number, plaintext: String, b: number): String {
   if (relativelyPrime(m)) {
     var ciphertext = new String("");
     plaintext = plaintext.toUpperCase().replace(/[^A-Z]/g, "");
-    console.log(plaintext);
-    console.log("m =", m, "b =", b);
     for (let x = 0; x < plaintext.length; x++) {
       const cipherNum =
         ((m * (plaintext.charCodeAt(x) - BASE_ORD) + b) % ALPHA_NUM) + BASE_ORD;
@@ -46,7 +44,6 @@ export function decAffine(m: number, ciphertext: String, b: number): String {
           ALPHA_NUM) +
         BASE_ORD;
       decryptedtext += String.fromCharCode(decryptedNum);
-      console.log(decryptedNum);
     }
     return decryptedtext;
   }

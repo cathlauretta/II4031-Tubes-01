@@ -64,14 +64,8 @@ export default function Home() {
   useEffect(() => {
     if (file) {
       setFileName(file.name);
-      console.log(file.name);
       const reader = new FileReader();
-
-      if (file.name.includes(".txt")) {
-        reader.readAsText(file);
-      } else {
-        reader.readAsBinaryString(file);
-      }
+      reader.readAsBinaryString(file);
 
       reader.onload = function (e) {
         const text = reader.result as string;
@@ -242,7 +236,6 @@ export default function Home() {
                     bgColor={DEFAULT_BG_COLOR}
                     onChange={(e) => {
                       setMKey(parseInt(e.target.value));
-                      // console.log("M-Key =", mKey);
                     }}
                   />
                 </NumberInput>
@@ -255,7 +248,6 @@ export default function Home() {
                     bgColor={DEFAULT_BG_COLOR}
                     onChange={(e) => {
                       setBKey(parseInt(e.target.value));
-                      // console.log("B-Key =", bKey);
                     }}
                   />
                 </NumberInput>
