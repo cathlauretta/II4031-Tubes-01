@@ -68,13 +68,12 @@ export function decVigenere(ciphertext: String, key: String, type: number): Stri
   if (type == 2) {
     key = sanitizeKey(key)
     fullkey = loopKey(key, ciphertext.length);
-    console.log(fullkey)
+
     for (let x = 0; x < ciphertext.length; x++) {
       var cipherNum = ((ciphertext.charCodeAt(x) - BASE_ORD - (fullkey.charCodeAt(x) - BASE_ORD)) % 256) + BASE_ORD;
       if (cipherNum < 0) {
         cipherNum += 256;
       }
-      console.log(cipherNum);
       decryptedtext += (String.fromCharCode(cipherNum));
     }
   } else {
