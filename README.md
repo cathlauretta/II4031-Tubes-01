@@ -2,6 +2,12 @@
 ## II4031 Kriptografi dan Koding
 
 ## Table of Contents
+- [Program Description](#program-description)
+- [List of Cipher Algorithm](#list-of-cipher-algorithm)
+- [Requirements](#requirements)
+- [How to Run the Program](#how-to-run-the-program)
+- [Project Structure](#project-structure)
+- [Authors](#authors)
 
 ## Program Description
 NDCrypto is a web-based application to encrypt and decrypt text or file based on user's input with some classic cipher algorithms.
