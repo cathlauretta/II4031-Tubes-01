@@ -64,6 +64,8 @@ export default function Home() {
 
   const handleInputTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setInputType(e.target.value);
+    setFile(null);
+    setInputText("");
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -303,7 +305,7 @@ export default function Home() {
               isDisabled={
                 !algo ||
                 !hasAlphabet(key) ||
-                (!isTxtFile(fileName) && algo != "Extended Vigenere Cipher") ||
+                (file && !isTxtFile(fileName) && algo != "Extended Vigenere Cipher") ||
                 algo == "Affine Cipher"
                   ? !mKey || !bKey || !relativelyPrime(mKey)
                   : !inputText
@@ -321,7 +323,7 @@ export default function Home() {
               isDisabled={
                 !algo ||
                 !hasAlphabet(key) ||
-                (!isTxtFile(fileName) && algo != "Extended Vigenere Cipher") ||
+                (file && !isTxtFile(fileName) && algo != "Extended Vigenere Cipher") ||
                 algo == "Affine Cipher"
                   ? !mKey || !bKey || !relativelyPrime(mKey)
                   : !inputText
