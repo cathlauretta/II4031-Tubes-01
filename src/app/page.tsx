@@ -14,7 +14,8 @@ import {
   Textarea,
   NumberInputField,
   ChakraProvider,
-  FormHelperText,
+  Alert,
+  AlertIcon,
 } from "@chakra-ui/react";
 import React, { ReactHTMLElement, useEffect, useState } from "react";
 import { encAffine, decAffine } from "../utils/affine";
@@ -63,6 +64,7 @@ export default function Home() {
   useEffect(() => {
     if (file) {
       setFileName(file.name);
+      console.log(file.name);
       const reader = new FileReader();
 
       if (file.name.includes(".txt")) {
@@ -97,9 +99,21 @@ export default function Home() {
     link.href = URL.createObjectURL(blob);
 
     if (fileName === "") {
-      link.download = "result.txt";
+      if (value === "encrypt") {
+        link.download = "encrypted_result.txt";
+      } else if (value === "decrypt") {
+        link.download = "decrypted_result.txt";
+      } else {
+        link.download = "result.txt";
+      }
     } else {
-      link.download = "result_" + fileName;
+      if (value === "encrypt") {
+        link.download = "encrypted_result_" + fileName;
+      } else if (value === "decrypt") {
+        link.download = "decrypted_result_" + fileName;
+      } else {
+        link.download = "result.txt";
+      }
     }
 
     link.click();
@@ -194,6 +208,15 @@ export default function Home() {
                   }
                 }}
               />
+              <>
+                {file && file.size > 1024 * 1024 * 1.5 ? (
+                  <Alert status="warning" fontSize="14px">
+                    <AlertIcon h="4" />
+                    For a better performance, please select a file that is 1.5
+                    MB or less.
+                  </Alert>
+                ) : null}
+              </>
             </Flex>
           )}
 
@@ -247,7 +270,6 @@ export default function Home() {
                   bgColor={DEFAULT_BG_COLOR}
                   onChange={(e) => setKey(e.target.value)}
                 />
-                <FormHelperText>Please Only Use Alphabet</FormHelperText>
               </FormControl>
             </Flex>
           )}
@@ -262,14 +284,14 @@ export default function Home() {
         <ButtonGroup spacing={4}>
           {value === "encrypt" ? (
             <Button
-              isDisabled={!key || !algo || !inputText || !hasAlphabet(key)}
+              isDisabled={!algo || !inputText || !hasAlphabet(key)}
               onClick={(e) => handleEncrypt()}
               colorScheme="green">
               Encrypt
             </Button>
           ) : (
             <Button
-              isDisabled={!key || !algo || !inputText || !hasAlphabet(key)}
+              isDisabled={!algo || !inputText || !hasAlphabet(key)}
               onClick={(e) => handleDecrypt()}
               colorScheme="orange">
               Decrypt
@@ -294,13 +316,14 @@ export default function Home() {
               <Flex
                 bgColor={DEFAULT_BG_COLOR}
                 minHeight={"100px"}
-                maxHeight={"500px"}
+                maxHeight={"250px"}
                 borderRadius={"6px"}
                 border={"1px solid #e2e8f0"}
                 paddingX={4}
                 paddingY={2}
                 maxWidth={"100%"}
-                overflowY={"auto"}>
+                wordBreak={"break-all"}
+                overflowY={"scroll"}>
                 {resultText}
               </Flex>
             </Flex>
@@ -309,13 +332,14 @@ export default function Home() {
               <Flex
                 bgColor={DEFAULT_BG_COLOR}
                 minHeight={"100px"}
-                maxHeight={"500px"}
+                maxHeight={"250px"}
                 borderRadius={"6px"}
                 border={"1px solid #e2e8f0"}
                 paddingX={4}
                 paddingY={2}
                 maxWidth={"100%"}
-                overflowY={"auto"}>
+                wordBreak={"break-all"}
+                overflowY={"scroll"}>
                 {encodeBase64(resultText)}
               </Flex>
             </Flex>
