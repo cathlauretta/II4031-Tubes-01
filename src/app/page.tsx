@@ -49,6 +49,9 @@ export default function Home() {
 
   const resetKey = () => {
     setKey("");
+  }
+
+  const resetAffineKey = () => {
     setBKey(0);
     setMKey(0);
   };
@@ -59,7 +62,11 @@ export default function Home() {
 
   const handleAlgoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setAlgo(e.target.value);
-    resetKey();
+    if (e.target.value === "Affine Cipher") {
+      resetKey();
+    } else {
+      resetAffineKey();
+    }
   };
 
   const handleInputTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
