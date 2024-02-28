@@ -316,13 +316,14 @@ export default function Home() {
               <Flex
                 bgColor={DEFAULT_BG_COLOR}
                 minHeight={"100px"}
-                maxHeight={"500px"}
+                maxHeight={"250px"}
                 borderRadius={"6px"}
                 border={"1px solid #e2e8f0"}
                 paddingX={4}
                 paddingY={2}
                 maxWidth={"100%"}
-                overflowY={"auto"}>
+                wordBreak={"break-all"}
+                overflowY={"scroll"}>
                 {resultText}
               </Flex>
             </Flex>
@@ -331,13 +332,14 @@ export default function Home() {
               <Flex
                 bgColor={DEFAULT_BG_COLOR}
                 minHeight={"100px"}
-                maxHeight={"500px"}
+                maxHeight={"250px"}
                 borderRadius={"6px"}
                 border={"1px solid #e2e8f0"}
                 paddingX={4}
                 paddingY={2}
                 maxWidth={"100%"}
-                overflowY={"auto"}>
+                wordBreak={"break-all"}
+                overflowY={"scroll"}>
                 {encodeBase64(resultText)}
               </Flex>
             </Flex>
