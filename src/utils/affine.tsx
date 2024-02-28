@@ -10,8 +10,8 @@ const inverseMod = (a: number, mod: number): number => {
   throw new Error("Can Not Find Mod Inverse!");
 };
 
-const relativelyPrime = (m: number): boolean => {
-  if (m % 2 == 0 || m % 13 == 0 || m % ALPHA_NUM == 0) {
+export const relativelyPrime = (m: number): boolean => {
+  if (m % 2 == 0 || m % 13 == 0 || m % ALPHA_NUM == 0 || m <= 1) {
     return false;
   }
   return true;

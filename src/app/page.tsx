@@ -18,7 +18,7 @@ import {
   AlertIcon,
 } from "@chakra-ui/react";
 import React, { ReactHTMLElement, useEffect, useState } from "react";
-import { encAffine, decAffine } from "../utils/affine";
+import { encAffine, decAffine, relativelyPrime } from "../utils/affine";
 import { encPlayfair, decPlayfair } from "@/utils/playfair";
 import { encVigenere, decVigenere } from "@/utils/vigenere";
 import { encProduct, decProduct } from "@/utils/product";
@@ -35,9 +35,11 @@ const ALGO_LIST = [
 
 export default function Home() {
   const [value, setValue] = useState("encrypt");
+  const [click, setClick] = useState<string>("");
   const [algo, setAlgo] = useState<string>("");
   const [inputType, setInputType] = useState<string>("text");
   const [inputText, setInputText] = useState<string>("");
+  const [text, setText] = useState<string>("");
   const [key, setKey] = useState<string>("");
   const [mKey, setMKey] = useState<number>(0);
   const [bKey, setBKey] = useState<number>(0);
@@ -45,12 +47,19 @@ export default function Home() {
   const [file, setFile] = useState<File | null>();
   const [fileName, setFileName] = useState("");
 
+  const resetKey = () => {
+    setKey("");
+    setBKey(0);
+    setMKey(0);
+  };
+
   const hasAlphabet = (input: string) => {
     return /[a-zA-Z]/.test(input.replace(/[^A-Za-z]/g, ""));
   };
 
   const handleAlgoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setAlgo(e.target.value);
+    resetKey();
   };
 
   const handleInputTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -149,6 +158,13 @@ export default function Home() {
     }
   };
 
+  const isTxtFile = (fileName: string): boolean => {
+    if (fileName.slice(fileName.indexOf("."), fileName.length) === ".txt") {
+      return true;
+    }
+    return false;
+  };
+
   return (
     <ChakraProvider>
       <title>NDCrypto - Cipher Tool</title>
@@ -206,8 +222,8 @@ export default function Home() {
                 {file && file.size > 1024 * 1024 * 1.5 ? (
                   <Alert status="warning" fontSize="14px">
                     <AlertIcon h="4" />
-                    For a better performance, please select a file that is 1.5
-                    MB or less.
+                    For a better performance, please select a file that is 1 MB
+                    or less.
                   </Alert>
                 ) : null}
               </>
@@ -239,6 +255,14 @@ export default function Home() {
                     }}
                   />
                 </NumberInput>
+                <>
+                  {!relativelyPrime(mKey) ? (
+                    <Alert status="warning" fontSize="14px">
+                      <AlertIcon h="4" />
+                      The number {mKey} is not relatively prime to 26
+                    </Alert>
+                  ) : null}
+                </>
               </Flex>
               <Flex flexDir={"column"} width={"100%"}>
                 <FormLabel>B-Key</FormLabel>
@@ -276,15 +300,37 @@ export default function Home() {
         <ButtonGroup spacing={4}>
           {value === "encrypt" ? (
             <Button
-              isDisabled={!algo || !inputText || !hasAlphabet(key)}
-              onClick={(e) => handleEncrypt()}
+              isDisabled={
+                !algo ||
+                !hasAlphabet(key) ||
+                (!isTxtFile(fileName) && algo != "Extended Vigenere Cipher") ||
+                algo == "Affine Cipher"
+                  ? !mKey || !bKey || !relativelyPrime(mKey)
+                  : !inputText
+              }
+              onClick={(e) => {
+                handleEncrypt();
+                setClick("encrypt");
+                setText(inputText);
+              }}
               colorScheme="green">
               Encrypt
             </Button>
           ) : (
             <Button
-              isDisabled={!algo || !inputText || !hasAlphabet(key)}
-              onClick={(e) => handleDecrypt()}
+              isDisabled={
+                !algo ||
+                !hasAlphabet(key) ||
+                (!isTxtFile(fileName) && algo != "Extended Vigenere Cipher") ||
+                algo == "Affine Cipher"
+                  ? !mKey || !bKey || !relativelyPrime(mKey)
+                  : !inputText
+              }
+              onClick={(e) => {
+                handleDecrypt();
+                setClick("decrypt");
+                setText(inputText);
+              }}
               colorScheme="orange">
               Decrypt
             </Button>
@@ -303,6 +349,28 @@ export default function Home() {
             width={{ base: "80%", md: "70%" }}
             paddingBottom={8}
             gap={4}>
+            {algo != "Extended Vigenere Cipher" ? (
+              <Flex flexDir={"column"}>
+                {click === "encrypt" ? (
+                  <FormLabel>Plaintext</FormLabel>
+                ) : (
+                  <FormLabel>Ciphertext</FormLabel>
+                )}
+                <Flex
+                  bgColor={DEFAULT_BG_COLOR}
+                  minHeight={"100px"}
+                  maxHeight={"250px"}
+                  borderRadius={"6px"}
+                  border={"1px solid #e2e8f0"}
+                  paddingX={4}
+                  paddingY={2}
+                  maxWidth={"100%"}
+                  wordBreak={"break-all"}
+                  overflowY={"scroll"}>
+                  {text.toUpperCase().replace(/[^A-Z]/g, "")}
+                </Flex>
+              </Flex>
+            ) : null}
             <Flex flexDir={"column"}>
               <FormLabel>Result</FormLabel>
               <Flex
